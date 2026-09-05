@@ -12,3 +12,7 @@ pgdata
 lifelikegame_key.pem
 
 docs*
+
+.agents*
+
+.superpowers*
