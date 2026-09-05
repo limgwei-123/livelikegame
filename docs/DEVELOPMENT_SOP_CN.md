@@ -195,77 +195,64 @@ git commit -m "<type>: <summary>"
 git push -u origin <branch>
 ```
 
-4. 在 GitHub 开 PR 到 `main`。
-5. 等 GitHub CI 通过。
-6. Merge PR。
-7. 回本地同步 `main`：
+4. 在 GitHub 网页开 PR 到 `main`。
+5. 在 PR 页面检查 diff 和 GitHub CI。
+6. 选择 `Squash and merge` 作为默认合并方式。
+
+如果 CI 还没有跑完，可以在 PR 页面启用 `Enable auto-merge`。启用后，GitHub 会在 required reviews 和 status checks 都通过后自动 merge。`Allow auto-merge` 只代表允许 PR 自动合并；它不会自动创建 PR。
+
+7. Repo 设置开启：
+
+```text
+Settings -> General -> Pull Requests -> Automatically delete head branches
+```
+
+已开启后，PR merge 后 GitHub 会自动删除远端 feature branch。
+
+8. 用户在 GitHub 完成 PR merge 后，通知 Codex：
+
+```text
+merge 了，帮我清理本地 branch 并回 main
+```
+
+9. Codex 回本地同步 `main`：
 
 ```powershell
 git switch main
 git pull origin main
 ```
 
-8. 删除已合并的本地功能分支：
+10. Codex 删除本地功能分支：
 
 ```powershell
-git branch -d <branch>
+git branch -D <branch>
 ```
+
+使用 `Squash and merge` 时，本地原 feature branch commit 不会以同一个 commit hash 出现在 `main`，所以 `git branch -d` 可能会拒绝删除。确认 PR 已经 merge 后，用 `git branch -D` 删除本地 branch。
+
+11. 更新阶段进度 tracker：
+
+```text
+docs/Lifelikegame_Phase_Progress_Tracker_CN.xlsx
+```
+
+至少更新：
+
+1. 对应 tracker ID 的进度 / 状态。
+2. 完成日期。
+3. 必要时补充备注，例如 commit、PR、测试结果或遗留事项。
 
 ## 下一项计划
 
-当前下一项是 Phase 1 ID 9：补完整 Interface 参数与返回类型。
+每次开始下一项前，以 tracker 为准，不在 SOP 里长期写死某一个 ID。
 
-目标：
+选择下一项时：
 
-```text
-Pyright/Mypy 不再报告 Interface 签名不一致。
-```
-
-主要范围：
-
-```text
-backend/app/*/interfaces.py
-```
-
-预计会检查：
-
-```text
-backend/app/auth/interfaces.py
-backend/app/users/interfaces.py
-backend/app/goals/interfaces.py
-backend/app/tasks/interfaces.py
-backend/app/task_schedules/interfaces.py
-backend/app/task_instances/interfaces.py
-backend/app/scoring_schemes/interfaces.py
-backend/app/point_ledgers/interfaces.py
-backend/app/rewards/interfaces.py
-backend/app/redemptions/interfaces.py
-backend/app/workflows/*/interfaces.py
-backend/app/ai_planner/interfaces.py
-```
-
-对应读取：
-
-```text
-backend/app/*/service.py
-backend/app/*/schemas.py
-backend/app/*/models.py
-```
-
-## ID 9 不做什么
-
-ID 9 只收紧 interface 类型边界。
-
-本任务不做：
-
-1. UnitOfWork。
-2. CQRS。
-3. Transaction ownership 改造。
-4. Repository 去除 commit。
-5. 大规模 DTO migration。
-6. 业务流程重写。
-
-这些留到 Phase 2。
+1. 读取 `docs/Lifelikegame_Phase_Progress_Tracker_CN.xlsx`。
+2. 优先选择当前 Phase 中 `Required = yes`、依赖已完成、进度未完成的最高优先级任务。
+3. 对照 `docs/Lifelikegame Technical Development Plan.md`，确认该任务是否应该现在做。
+4. 向用户说明建议做的 tracker ID、原因、范围和不做范围。
+5. 用户确认后，才进入 branch 流程。
 
 ## Superpowers 使用规则
 
