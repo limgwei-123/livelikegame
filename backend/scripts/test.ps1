@@ -1,9 +1,11 @@
+[CmdletBinding(PositionalBinding = $false)]
 param(
+    [Parameter(ValueFromRemainingArguments = $true)]
+    [string[]]$PytestArgs,
     [string]$DatabaseName = "lifelikegame_test",
     [string]$PostgresUser = "postgres",
     [string]$PostgresPassword = "postgres",
-    [string]$HostPort = "5433",
-    [string[]]$PytestArgs = @("-q")
+    [string]$HostPort = "5433"
 )
 
 $ErrorActionPreference = "Stop"
@@ -35,4 +37,9 @@ Remove-Item Env:SCHEDULER_ENABLED -ErrorAction SilentlyContinue
 
 Set-Location $BackendDir
 
+if (-not $PytestArgs -or $PytestArgs.Count -eq 0) {
+    $PytestArgs = @("-q")
+}
+
 & $Python -m pytest @PytestArgs
+exit $LASTEXITCODE

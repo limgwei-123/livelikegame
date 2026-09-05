@@ -14,3 +14,21 @@ def test_login_success(client, test_user):
     data = response.json()
     assert "access_token" in data
 
+
+def test_duplicate_signup_returns_domain_error_payload(client):
+    payload = {
+        "email": "duplicate-domain-error@test.com",
+        "password": "password123",
+    }
+
+    first_response = client.post("/auth/signup", json=payload)
+    second_response = client.post("/auth/signup", json=payload)
+
+    assert first_response.status_code == 201
+    assert second_response.status_code == 409
+    assert second_response.json() == {
+        "code": "CONFLICT",
+        "message": "Email already registered",
+        "details": {},
+    }
+
